@@ -1,0 +1,87 @@
+ <!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<title>Home Menu</title>
+	</head>
+<body>
+<h4 style='color:red'>App Step 3: logout</h4>
+<h1>Logout</h1>
+<h4 id="message"></h4>
+<div id="user_profile"></div>
+<button type="button" id="create_logout">Logout</button>
+
+<!--javascript function.js -->
+<script src="function.js"></script>
+<script>
+	// step 3: logout
+	// step 3.1:
+	var login_blok=sessionStorage.getItem("login_blok");
+	var create_logout=document.getElementById('create_logout');
+	var user_profile=document.getElementById('user_profile');
+	var html;
+	
+	// step 3.2:	
+	// membaca apakah ada nomer login?
+	function loginRead(){
+		var obj={"login_blok":login_blok}
+		
+		// mengirim data ke API login/read.php
+		loadXHR('https://datablok.id/v0/login/read.php',obj,loginReadShow);
+	}
+	
+	// step 3.3:
+	function loginReadShow(paket){
+		if (paket.err===0){
+			html='<ul>'
+				+'<li><h4>User Login</h4></li>'
+				+'<li><label>Login Blok (ID)</label>: '+login_blok+'</li>'
+				+'<li><label>User Blok (ID)</label>: '+paket.data[0].user_blok+'</li>'
+				+'<li><label>User Name</label>: '+paket.data[0].user_name+'</li>'
+				+'<li><label>Full Name</label>: '+paket.data[0].user_fullname+'</li>'
+				+'<li><label>Email Address</label>: '+paket.data[0].email_address+'</li>'
+				+'<li><label>Mobile Number</label>: '+paket.data[0].mobile_number+'</li>'
+				+'<li><label>Quota</label>: '+paket.data[0].quota_tx+'</li>'
+				+'<li><label>Used</label>: '+paket.data[0].used_tx+'</li>'
+				+'<li><label>Company Name</label>: '+paket.data[0].company_name+'</li>'
+				+'<li><label>Company blok</label>: '+paket.data[0].company_blok+'</li>'
+				+'</ul>';
+			user_profile.innerHTML=html;	
+		}
+		else{
+			sessionStorage.removeItem('login_blok');
+			window.location.href="login.html";
+		}
+	}
+
+	// step 3.4:
+	// tombol logout diklik, untuk menghapus nomer login di server. 
+	// sehingga login blok tersebut tidak bisa digunakan lagi.
+	create_logout.onclick=function(){
+		var obj={"login_blok":login_blok}
+		loadXHR('https://datablok.id/v0/logout/create.php',obj,terimaData);
+	}
+	
+	// step 3.5:
+	function terimaData(paket){
+		// bila tidak ada error, bersihkan storage lokal, 
+		// lalu kembali ke halaman login
+		if (paket.err===0){
+			sessionStorage.removeItem('login_blok');
+			window.location.href="login.html";
+		}
+		// bila ada error, tampilkan pesan error ke layar pesan.
+		else{
+			message.innerHTML=paket.msg;
+		}
+	}
+	
+	// step 3.6: switch create
+	// step 3.7: switch message
+	// step 3.8:
+	// panggil data login
+	loginRead();
+</script>
+</body>
+</html> 
